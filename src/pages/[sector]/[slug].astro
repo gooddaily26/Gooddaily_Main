@@ -1,0 +1,233 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBrand } from '../../seo.config';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import SubpageSidebar from '../../components/SubpageSidebar.astro';
+import { getService, SITE } from '../../consts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { sector: post.data.sector, slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+const service = getService(post.data.sector)!;
+
+const siblings = (await getCollection('posts', ({ data, slug }) =>
+  data.sector === post.data.sector && slug !== post.slug && !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 5);
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  ...(post.data.updatedDate ? { dateModified: post.data.updatedDate.toISOString() } : {}),
+  ...(post.data.heroImage ? { image: new URL(post.data.heroImage, SITE.url).href } : {}),
+  author: { '@type': 'Organization', name: SITE.legalName },
+  publisher: { '@type': 'Organization', name: SITE.legalName, url: SITE.url },
+  mainEntityOfPage: new URL(`/${post.data.sector}/${post.slug}/`, SITE.url).href,
+};
+
+const fmt = (d: Date) => d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout
+  title={withBrand(post.data.title)}
+  description={post.data.description}
+  image={post.data.heroImage ?? SITE.ogImage}
+>
+  <script type="application/ld+json" slot="jsonld" set:html={JSON.stringify(articleJsonLd)} />
+
+  <div class="page-post">
+    <div class="container subpage-layout">
+      <SubpageSidebar />
+      <div class="subpage-main">
+    <Breadcrumb items={[
+      { name: service.name, href: `/${service.slug}/` },
+      { name: post.data.title },
+    ]} />
+
+  <article class="article article-board">
+    <header>
+      <h1>{post.data.title}</h1>
+      <p class="meta">
+        <a href={`/${service.slug}/`}>{service.name}</a>
+        <span aria-hidden="true"> · </span>
+        <time datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
+      </p>
+    </header>
+
+    {post.data.heroImage && (
+      <img src={post.data.heroImage} alt={post.data.heroImageAlt ?? post.data.title} />
+    )}
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <p class="back-to-pillar">
+      <a href={`/${service.slug}/`}>← {service.name} 전체 보기</a>
+    </p>
+
+    {siblings.length > 0 && (
+      <aside class="related-posts" aria-labelledby="related-posts-title">
+        <h2 id="related-posts-title">{service.name}의 다른 글</h2>
+        <ul>
+          {siblings.map((s) => (
+            <li><a href={`/${s.data.sector}/${s.slug}/`}>{s.data.title}</a></li>
+          ))}
+        </ul>
+      </aside>
+    )}
+  </article>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .article {
+    max-width: none;
+    margin: 0;
+    padding: 34px 42px 48px;
+  }
+
+  .article header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .article h1 {
+    max-width: 760px;
+    margin-bottom: 14px;
+    color: #102b5f;
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: 0;
+    word-break: keep-all;
+  }
+
+  .meta {
+    color: #8392a8;
+    font-family: var(--font-caption);
+    font-size: 14px;
+    font-weight: 300;
+  }
+
+  .meta a {
+    color: #3367f6;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .article img {
+    border-radius: 20px;
+    margin: 24px 0;
+  }
+
+  .prose {
+    padding: 24px;
+    border-radius: 18px;
+    background: #f7f9fc;
+    color: #405577;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.85;
+    word-break: keep-all;
+  }
+
+  .prose :global(h2) {
+    margin-top: 38px;
+    margin-bottom: 16px;
+    padding-top: 24px;
+    border-top: 1px solid #e6eef8;
+    color: #102b5f;
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .prose :global(p) {
+    margin: 0 0 18px;
+  }
+
+  .prose :global(:last-child) {
+    margin-bottom: 0;
+  }
+
+  .prose :global(blockquote) {
+    margin: 0 0 28px;
+    padding: 0 0 0 16px;
+    border-left: 3px solid #d6e7f8;
+    color: #6b7d96;
+    font-family: var(--font-caption);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .prose :global(blockquote p) {
+    margin-bottom: 0;
+  }
+
+  .prose :global(img) {
+    border-radius: 20px;
+  }
+
+  .back-to-pillar { margin-top: 2.5rem; }
+  .back-to-pillar a { color: #3367f6; font-size: 15px; text-decoration: none; font-weight: 500; }
+  .related-posts {
+    margin-top: 46px;
+    padding-top: 24px;
+    border-top: 1px solid #dbe1e7;
+  }
+
+  .related-posts h2 {
+    margin-bottom: 14px;
+    color: #102b5f;
+    font-size: 21px;
+    font-weight: 600;
+  }
+
+  .related-posts ul { list-style: none; padding: 0; }
+  .related-posts li { padding: 8px 0; }
+  .related-posts a {
+    color: #405577;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  @media (max-width: 620px) {
+    .article {
+      padding-top: 24px;
+      padding-left: 0;
+      padding-right: 0;
+      padding-bottom: 52px;
+    }
+
+    .article h1 {
+      font-size: 21px;
+    }
+
+    .prose {
+      font-size: 15px;
+    }
+
+    .prose :global(h2) {
+      font-size: 20px;
+    }
+  }
+</style>

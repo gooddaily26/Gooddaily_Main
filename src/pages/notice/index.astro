@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SEO } from '../../seo.config';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import SubpageSidebar from '../../components/SubpageSidebar.astro';
+
+const notices = (await getCollection('notices', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const fmt = (d: Date) => d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<BaseLayout title={SEO.notice.title} description={SEO.notice.description} ogTitle={SEO.notice.ogTitle} ogDescription={SEO.notice.ogDescription} image={SEO.notice.ogImage}>
+  <div class="page-board page-notice">
+    <div class="container subpage-layout">
+      <SubpageSidebar />
+      <div class="subpage-main">
+      <Breadcrumb items={[{ name: '공지사항' }]} />
+      <section class="board-panel" aria-labelledby="notice-title">
+        <div class="board-header">
+          <p class="common-badge">Notice</p>
+          <h1 id="notice-title">공지사항</h1>
+          <p>굿데일리의 주요 안내와 운영 소식을 확인하세요.</p>
+        </div>
+
+        {notices.length === 0 ? (
+          <p class="board-empty">등록된 공지가 없습니다.</p>
+        ) : (
+          <ul class="board-list">
+            {notices.map((n) => (
+              <li>
+                <a href={`/notice/${n.slug}/`}>
+                  <span>{n.data.title}</span>
+                  <time datetime={n.data.pubDate.toISOString()}>{fmt(n.data.pubDate)}</time>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

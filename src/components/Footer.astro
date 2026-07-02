@@ -1,0 +1,161 @@
+---
+import { SITE, BUSINESS, UTIL_NAV, SOCIAL, CONTACT, SERVICES_ORDERED } from '../consts';
+import ArrowIcon from './ArrowIcon.astro';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__main">
+      <div class="site-footer__brand">
+        <a href="/" class="site-brand site-brand--footer" aria-label={`${SITE.name} 홈`}>
+          <img src="/images/brand/logo.png" alt={SITE.name} class="site-brand__logo" />
+        </a>
+        <p>{SITE.description}</p>
+        <div class="site-footer__quick">
+          <a class="site-footer__quick-phone" href={CONTACT.phoneHref}>전화 상담 <ArrowIcon /></a>
+          <a class="site-footer__quick-kakao" href={CONTACT.kakaoChannel} target="_blank" rel="noopener">카카오톡 문의 <ArrowIcon /></a>
+        </div>
+        {SOCIAL.length > 0 && (
+          <ul class="site-footer__social" aria-label="소셜 링크">
+            {SOCIAL.map((s) => (
+              <li><a href={s.url} target="_blank" rel="noopener">{s.label}</a></li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <nav class="site-footer__nav" aria-label="푸터 메뉴">
+        <div>
+          <h2>회사</h2>
+          <ul>
+            <li><a href="/about/">회사소개</a></li>
+            {UTIL_NAV.map((item) => (
+              <li><a href={item.href}>{item.label}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2>서비스</h2>
+          <ul>
+            {SERVICES_ORDERED.map((service) => (
+              <li><a href={`/${service.slug}/`}>{service.name}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2>고객지원</h2>
+          <ul>
+            <li><a href={CONTACT.phoneHref}>전화 상담</a></li>
+            <li><a href={CONTACT.kakaoChannel} target="_blank" rel="noopener">카카오톡 문의</a></li>
+            <li><a href="/notice/">공지사항</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <div class="site-footer__legal">
+    <div class="container site-footer__legal-inner">
+      <address class="site-footer__biz">
+      <dl>
+        <div>
+          <dt>상호</dt>
+          <dd>{BUSINESS.company}</dd>
+        </div>
+        {BUSINESS.ceo && (
+          <div>
+            <dt>대표</dt>
+            <dd>{BUSINESS.ceo}</dd>
+          </div>
+        )}
+        {BUSINESS.bizNo && (
+          <div>
+            <dt>사업자등록번호</dt>
+            <dd>{BUSINESS.bizNo}</dd>
+          </div>
+        )}
+        {BUSINESS.address && (
+          <div>
+            <dt>주소</dt>
+            <dd>{BUSINESS.address}</dd>
+          </div>
+        )}
+        <div>
+          <dt>고객문의</dt>
+          <dd><a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a></dd>
+        </div>
+        {BUSINESS.email && (
+          <div>
+            <dt>이메일</dt>
+            <dd><a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a></dd>
+          </div>
+        )}
+      </dl>
+      </address>
+
+      <div class="site-footer__bottom">
+      <p>© {year} {BUSINESS.company}. All rights reserved.</p>
+        <ul aria-label="정책 링크">
+          <li><button type="button" data-legal-modal-open="privacy">개인정보처리방침</button></li>
+          <li><button type="button" data-legal-modal-open="terms">이용약관</button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="legal-modal" data-legal-modal="privacy" aria-labelledby="privacy-modal-title">
+    <div class="legal-modal__panel">
+      <div class="legal-modal__header">
+        <h2 id="privacy-modal-title">개인정보처리방침</h2>
+        <button class="legal-modal__close" type="button" data-legal-modal-close aria-label="개인정보처리방침 닫기">×</button>
+      </div>
+      <div class="legal-modal__body">
+        <p>{BUSINESS.company}는 상담 문의, 서비스 안내, 고객 응대에 필요한 범위에서 개인정보를 수집하고 이용합니다.</p>
+        <dl>
+          <div>
+            <dt>수집 항목</dt>
+            <dd>이름, 연락처, 이메일, 문의 내용 등 사용자가 직접 제공한 정보</dd>
+          </div>
+          <div>
+            <dt>이용 목적</dt>
+            <dd>상담 접수, 문의 응대, 서비스 안내, 계약 및 정산 관련 연락</dd>
+          </div>
+          <div>
+            <dt>보유 기간</dt>
+            <dd>목적 달성 후 지체 없이 파기하며, 관계 법령에 따라 보관이 필요한 경우 해당 기간 동안 보관합니다.</dd>
+          </div>
+        </dl>
+        <p>
+          개인정보 관련 문의는 {CONTACT.phoneDisplay}
+          {BUSINESS.email ? <> 또는 {BUSINESS.email}</> : null}로 연락해 주세요.
+        </p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="legal-modal" data-legal-modal="terms" aria-labelledby="terms-modal-title">
+    <div class="legal-modal__panel">
+      <div class="legal-modal__header">
+        <h2 id="terms-modal-title">이용약관</h2>
+        <button class="legal-modal__close" type="button" data-legal-modal-close aria-label="이용약관 닫기">×</button>
+      </div>
+      <div class="legal-modal__body">
+        <p>본 약관은 {BUSINESS.company} 웹사이트와 상담 채널 이용에 필요한 기본 사항을 안내합니다.</p>
+        <dl>
+          <div>
+            <dt>서비스 이용</dt>
+            <dd>사이트의 정보는 서비스 소개와 상담 안내를 목적으로 제공되며, 세부 조건은 개별 상담과 계약 내용에 따릅니다.</dd>
+          </div>
+          <div>
+            <dt>이용자 책임</dt>
+            <dd>이용자는 문의 시 정확한 정보를 제공해야 하며, 타인의 권리나 사이트 운영을 침해하는 행위를 해서는 안 됩니다.</dd>
+          </div>
+          <div>
+            <dt>책임 제한</dt>
+            <dd>외부 링크, 통신 환경, 사용자의 입력 오류 등 회사가 통제하기 어려운 사유로 발생한 문제는 책임 범위에서 제외될 수 있습니다.</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </dialog>
+</footer>

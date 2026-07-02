@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SEO } from '../seo.config';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import ArrowIcon from '../components/ArrowIcon.astro';
+import SubpageSidebar from '../components/SubpageSidebar.astro';
+import { SITE, CONTACT, SERVICES_ORDERED } from '../consts';
+---
+
+<BaseLayout title={SEO.about.title} description={SEO.about.description} ogTitle={SEO.about.ogTitle} ogDescription={SEO.about.ogDescription} image={SEO.about.ogImage}>
+  <div class="page-about">
+    <div class="container subpage-layout">
+      <SubpageSidebar />
+      <div class="subpage-main">
+      <Breadcrumb items={[{ name: '회사소개' }]} />
+
+      <article class="service-panel">
+      <section class="about-hero" aria-labelledby="about-title">
+        <div>
+          <p class="common-badge">About Good Daily</p>
+          <h1 id="about-title">사업 운영에 필요한 일을 함께 정리하는 파트너</h1>
+          <p>
+            {SITE.name}는 결제, 상품권 자동매입, 검색 마케팅, 업무 솔루션 개발을 한 흐름에서 바라보고
+            고객의 상황에 맞는 실무형 서비스를 제공합니다.
+          </p>
+        </div>
+        <div class="about-hero__media" aria-hidden="true">
+          <img src="/images/home/about-gooddaily-meeting.png" alt="" loading="lazy" />
+        </div>
+      </section>
+
+      <section class="about-section" aria-labelledby="about-services-title">
+        <div class="about-section__header">
+          <h2 id="about-services-title">굿데일리가 다루는 일</h2>
+        </div>
+        <ul class="about-service-list">
+          {SERVICES_ORDERED.map((service) => (
+            <li>
+              <a href={`/${service.slug}/`}>
+                <strong>{service.name}</strong>
+                <span>{service.tagline}</span>
+                <ArrowIcon />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="about-cta" aria-labelledby="about-cta-title">
+        <h2 id="about-cta-title">필요한 서비스가 있다면 상담으로 시작하세요</h2>
+        <p>현재 상황을 확인한 뒤 결제, 상품권, 마케팅, 솔루션 중 필요한 흐름을 함께 정리해 드립니다.</p>
+        <div class="about-cta__actions">
+          <a class="common-button common-button--primary" href={CONTACT.phoneHref}>전화 상담 <ArrowIcon /></a>
+          <a class="common-button common-button--kakao" href={CONTACT.kakaoChannel} target="_blank" rel="noopener">카카오톡 문의 <ArrowIcon /></a>
+        </div>
+      </section>
+      </article>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

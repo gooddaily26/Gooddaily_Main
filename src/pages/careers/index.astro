@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SEO } from '../../seo.config';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import SubpageSidebar from '../../components/SubpageSidebar.astro';
+import { CONTACT } from '../../consts';
+
+const jobs = (await getCollection('careers', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const openJobs = jobs.filter((j) => j.data.open);
+const fmt = (d: Date) => d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<BaseLayout title={SEO.careers.title} description={SEO.careers.description} ogTitle={SEO.careers.ogTitle} ogDescription={SEO.careers.ogDescription} image={SEO.careers.ogImage}>
+  <div class="page-board page-careers">
+    <div class="container subpage-layout">
+      <SubpageSidebar />
+      <div class="subpage-main">
+      <Breadcrumb items={[{ name: '채용' }]} />
+      <section class="board-panel" aria-labelledby="careers-title">
+        <div class="board-header">
+          <p class="common-badge">Careers</p>
+          <h1 id="careers-title">채용</h1>
+          <p>결제, 상품권, 마케팅, 솔루션을 함께 다루는 굿데일리에서 실무형 동료를 찾습니다.</p>
+        </div>
+
+        {openJobs.length === 0 ? (
+          <div class="board-empty">
+            <p>현재 모집 중인 공고가 없습니다.</p>
+            <p>지원 문의는 <a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a> 또는 <a href={CONTACT.kakaoChannel} target="_blank" rel="noopener">카카오톡 채널</a>로 연락 주세요.</p>
+          </div>
+        ) : (
+          <ul class="board-list board-list--careers">
+            {openJobs.map((j) => (
+              <li>
+                <a href={`/careers/${j.slug}/`}>
+                  <span class="board-list__main">
+                    <span class="board-list__eyebrow">Recruiting</span>
+                    <span class="board-list__title">{j.data.title}</span>
+                    <span class="board-list__meta">
+                      {j.data.employmentType && <em>{j.data.employmentType}</em>}
+                      {j.data.location && <em>{j.data.location}</em>}
+                      <time datetime={j.data.pubDate.toISOString()}>{fmt(j.data.pubDate)}</time>
+                    </span>
+                  </span>
+                  <span class="board-list__action">상세보기</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

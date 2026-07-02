@@ -1,0 +1,59 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { seoTemplates } from '../../seo.config';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import SubpageSidebar from '../../components/SubpageSidebar.astro';
+import { SITE, CONTACT } from '../../consts';
+
+export async function getStaticPaths() {
+  const jobs = await getCollection('careers', ({ data }) => !data.draft);
+  return jobs.map((j) => ({ params: { slug: j.slug }, props: { job: j } }));
+}
+
+const { job } = Astro.props;
+const { Content } = await job.render();
+
+const jobJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'JobPosting',
+  title: job.data.title,
+  datePosted: job.data.pubDate.toISOString(),
+  ...(job.data.employmentType ? { employmentType: job.data.employmentType } : {}),
+  hiringOrganization: { '@type': 'Organization', name: SITE.legalName, sameAs: SITE.url },
+  ...(job.data.location
+    ? { jobLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: job.data.location, addressCountry: 'KR' } } }
+    : {}),
+};
+const fmt = (d: Date) => d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<BaseLayout title={seoTemplates.career(job.data.title).title} description={seoTemplates.career(job.data.title).description}>
+  <script type="application/ld+json" slot="jsonld" set:html={JSON.stringify(jobJsonLd)} />
+  <div class="page-board page-careers-detail">
+    <div class="container subpage-layout">
+      <SubpageSidebar />
+      <div class="subpage-main">
+      <Breadcrumb items={[
+        { name: '채용', href: '/careers/' },
+        { name: job.data.title },
+      ]} />
+      <article class="article article-board">
+        <header>
+          <h1>{job.data.title}</h1>
+          <p class="meta">
+            {job.data.employmentType && <span>{job.data.employmentType}</span>}
+            {job.data.location && <span>{job.data.location}</span>}
+            <time datetime={job.data.pubDate.toISOString()}>{fmt(job.data.pubDate)}</time>
+          </p>
+        </header>
+        <div class="prose"><Content /></div>
+        <div class="apply">
+          <a class="btn btn-primary" href={CONTACT.phoneHref}>전화 지원 문의</a>
+          <a class="btn btn-kakao" href={CONTACT.kakaoChannel} target="_blank" rel="noopener">카카오톡 문의</a>
+        </div>
+        <p class="back"><a href="/careers/">← 채용 목록</a></p>
+      </article>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,98 @@
+---
+import { SITE } from '../consts';
+
+interface Crumb { name: string; href?: string; }
+interface Props { items: Crumb[]; }
+const { items } = Astro.props;
+
+const all: Crumb[] = [{ name: '홈', href: '/' }, ...items];
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: all.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.name,
+    ...(c.href ? { item: new URL(c.href, SITE.url).href } : {}),
+  })),
+};
+---
+
+<nav aria-label="현재 위치" class="breadcrumb">
+  <ol>
+    {all.map((c, i) => (
+      <li>
+        {c.href && i < all.length - 1 ? (
+          <a href={c.href}>
+            {i === 0 && (
+              <svg class="breadcrumb__home-icon" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M3.5 8.7 10 3.2l6.5 5.5v7.1a1 1 0 0 1-1 1h-3.4v-4.6H7.9v4.6H4.5a1 1 0 0 1-1-1V8.7Z" />
+              </svg>
+            )}
+            {c.name}
+          </a>
+        ) : (
+          <span aria-current="page">{c.name}</span>
+        )}
+        {i < all.length - 1 && (
+          <svg class="breadcrumb__separator" viewBox="0 0 12 20" aria-hidden="true">
+            <path d="m4.5 5 4 5-4 5" />
+          </svg>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+
+<style is:global>
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    list-style: none;
+    margin: 0;
+    padding: 1rem 0;
+    color: var(--color-muted);
+    font-size: calc(.85rem + 1px);
+  }
+
+  .breadcrumb li {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .breadcrumb a {
+    display: inline-flex;
+    align-items: center;
+    gap: .32rem;
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+
+  .breadcrumb [aria-current="page"] {
+    color: var(--color-fg);
+  }
+
+  .breadcrumb__home-icon {
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+  }
+
+  .breadcrumb__separator {
+    width: 12px;
+    height: 16px;
+    color: #8d9ab0;
+  }
+
+  .breadcrumb__separator path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>

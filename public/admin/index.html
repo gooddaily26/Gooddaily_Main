@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- 관리자 화면은 검색 색인에서 제외 -->
+    <meta name="robots" content="noindex, nofollow" />
+    <title>굿데일리 콘텐츠 관리</title>
+  </head>
+  <body>
+    <!-- Sveltia CMS (Decap/Netlify CMS 후속) — config.yml 을 자동으로 읽습니다 -->
+    <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+
+    <!-- 본문 커스텀 블록(강조박스/형광펜/버튼)을 에디터 '삽입' 메뉴에 등록 -->
+    <script>
+      (function register() {
+        if (!window.CMS || !window.CMS.registerEditorComponent) {
+          return void setTimeout(register, 150); // CMS 로드 대기
+        }
+        var CMS = window.CMS;
+
+        // 1) 강조 박스 :::callout{type="..."} ... :::
+        CMS.registerEditorComponent({
+          id: 'callout',
+          label: '강조 박스',
+          fields: [
+            {
+              name: 'type', label: '종류', widget: 'select', default: 'info',
+              options: [
+                { label: '안내 (파랑)', value: 'info' },
+                { label: '팁 (초록)', value: 'tip' },
+                { label: '주의 (주황)', value: 'warn' },
+                { label: '핵심 (진파랑)', value: 'point' }
+              ]
+            },
+            { name: 'body', label: '박스 내용', widget: 'text', hint: '**굵게**, [링크](/) 등 사용 가능' }
+          ],
+          pattern: /^:::callout\{type="(info|tip|warn|point)"\}\n([\s\S]*?)\n:::/m,
+          fromBlock: function (m) { return { type: m[1], body: m[2] }; },
+          toBlock: function (d) {
+            return ':::callout{type="' + (d.type || 'info') + '"}\n' + (d.body || '') + '\n:::';
+          },
+          toPreview: function (d) { return '📌 [' + (d.type || 'info') + '] ' + (d.body || ''); }
+        });
+
+        // 2) 형광펜 :hl[텍스트]
+        CMS.registerEditorComponent({
+          id: 'hl',
+          label: '형광펜',
+          fields: [{ name: 'text', label: '강조할 문구', widget: 'string' }],
+          pattern: /:hl\[([^\]]+)\]/,
+          fromBlock: function (m) { return { text: m[1] }; },
+          toBlock: function (d) { return ':hl[' + (d.text || '') + ']'; },
+          toPreview: function (d) { return d.text || ''; }
+        });
+
+        // 3) 버튼형 링크 :button[라벨]{href="/경로"}
+        CMS.registerEditorComponent({
+          id: 'button',
+          label: '버튼',
+          fields: [
+            { name: 'label', label: '버튼 글자', widget: 'string' },
+            { name: 'href', label: '링크 주소', widget: 'string', hint: '예: /contact 또는 https://...' }
+          ],
+          pattern: /:button\[([^\]]+)\]\{href="([^"]+)"\}/,
+          fromBlock: function (m) { return { label: m[1], href: m[2] }; },
+          toBlock: function (d) { return ':button[' + (d.label || '') + ']{href="' + (d.href || '#') + '"}'; },
+          toPreview: function (d) { return '[' + (d.label || '') + ']'; }
+        });
+      })();
+    </script>
+  </body>
+</html>

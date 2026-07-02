@@ -1,0 +1,88 @@
+# =============================================================
+# Sveltia CMS 설정 — 비개발자 글쓰기 화면(/admin)
+# 컬렉션 필드는 src/content/config.ts 스키마와 1:1로 맞춰져 있습니다.
+# (TODO 두 곳만 채우면 동작: backend.repo, backend.base_url)
+# =============================================================
+
+backend:
+  name: github
+  repo: OWNER/REPO        # TODO: 깃허브 사용자명/저장소명 (예: gooddaily/goodaily-site)
+  branch: main
+  base_url: https://sveltia-cms-auth.YOUR-SUBDOMAIN.workers.dev  # TODO: OAuth 워커 주소 (ADMIN-SETUP.md 참고)
+
+# 이미지 업로드 위치 (레포에 저장 / 사이트에서 /images/uploads/ 로 참조)
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+# CMS UI 한국어
+locale: ko
+
+# ※ 검토 후 발행(editorial_workflow)은 현재 Sveltia 미지원.
+#    대신 각 글의 "임시저장(draft)"으로 게시 여부를 제어합니다.
+#    더 강한 검토가 필요하면 ADMIN-SETUP.md 의 "검토 게이트" 참고.
+
+collections:
+  # ---------- 포스팅 (섹터별 사일로) ----------
+  - name: posts
+    label: 포스팅
+    label_singular: 포스팅
+    folder: src/content/posts
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: 제목, widget: string }
+      - { name: description, label: 요약(검색 설명), widget: text, hint: "검색결과/목록에 보이는 1~2문장" }
+      - name: sector
+        label: 섹터
+        widget: select
+        options:
+          - { label: 마리나 단말기, value: terminal }
+          - { label: 마리나 바우처, value: voucher }
+          - { label: 마리나 마케팅, value: marketing }
+          - { label: 마리나 솔루션, value: solution }
+      - { name: pubDate, label: 발행일, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { name: updatedDate, label: 수정일, widget: datetime, required: false, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { name: heroImage, label: 대표 이미지, widget: image, required: false }
+      - { name: heroImageAlt, label: 이미지 설명(alt), widget: string, required: false, hint: "이미지 SEO용 — 키워드 포함 권장" }
+      - { name: draft, label: 임시저장(미게시), widget: boolean, default: false, hint: "켜면 사이트에 안 보입니다" }
+      # 본문: 리치 텍스트 + 커스텀 블록(강조박스/형광펜/버튼)
+      # editor_components 는 admin/index.html 에서 등록됩니다.
+      - name: body
+        label: 본문
+        widget: markdown
+        editor_components: [callout, hl, button, image, code-block]
+
+  # ---------- 공지사항 ----------
+  - name: notices
+    label: 공지사항
+    label_singular: 공지
+    folder: src/content/notices
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: 제목, widget: string }
+      - { name: pubDate, label: 발행일, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { name: draft, label: 임시저장(미게시), widget: boolean, default: false }
+      - { name: body, label: 본문, widget: markdown }
+
+  # ---------- 채용 ----------
+  - name: careers
+    label: 채용
+    label_singular: 공고
+    folder: src/content/careers
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: 공고 제목, widget: string }
+      - { name: employmentType, label: 고용형태, widget: string, required: false, hint: "예: 정규직, 계약직" }
+      - { name: location, label: 근무지, widget: string, required: false }
+      - { name: pubDate, label: 등록일, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { name: open, label: 모집중, widget: boolean, default: true }
+      - { name: draft, label: 임시저장(미게시), widget: boolean, default: false }
+      - { name: body, label: 상세 내용, widget: markdown }

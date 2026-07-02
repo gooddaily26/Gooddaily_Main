@@ -1,0 +1,16 @@
+{
+  "name": "goodaily-site",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^4.16.0",
+    "lenis": "^1.3.24",
+    "remark-directive": "^4.0.0"
+  }
+}

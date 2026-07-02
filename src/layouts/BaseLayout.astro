@@ -1,0 +1,206 @@
+---
+import { CONTACT, SITE } from '../consts';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { ViewTransitions } from 'astro:transitions';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+  ogTitle?: string;
+  ogDescription?: string;
+}
+
+const {
+  title,
+  description = SITE.description,
+  image = SITE.ogImage,
+  noindex = false,
+  ogTitle,
+  ogDescription,
+} = Astro.props;
+
+// OG/트위터 값: seo.config 에서 따로 지정하면 그 값, 없으면 타이틀/디스크립션 자동 사용
+const shareTitle = ogTitle ?? title;
+const shareDescription = ogDescription ?? description;
+
+// 타이틀 조립 규칙은 src/seo.config.ts 에서 관리합니다.
+// 여기서는 각 페이지가 넘긴 '완성된' 타이틀을 그대로 사용합니다.
+const fullTitle = title;
+
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const ogImageUrl = new URL(image, SITE.url).href;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content={SITE.themeColor} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={shareTitle} />
+    <meta property="og:description" content={shareDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content={String(SITE.ogImageWidth)} />
+    <meta property="og:image:height" content={String(SITE.ogImageHeight)} />
+    <meta property="og:image:alt" content={shareTitle} />
+    <meta property="og:locale" content="ko_KR" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={shareTitle} />
+    <meta name="twitter:description" content={shareDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={shareTitle} />
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <slot name="jsonld" />
+    <ViewTransitions />
+  </head>
+
+  <body>
+    <a href="#main" class="sr-only">본문 바로가기</a>
+    <Header transition:persist />
+    <main id="main" transition:name="page-content">
+      <slot />
+    </main>
+    <Footer transition:persist />
+    <div class="site-floating-actions" aria-label="빠른 이동">
+      <button class="site-scroll-top" type="button" data-scroll-top aria-label="맨 위로 이동">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6.8 14.2 12 9l5.2 5.2" />
+        </svg>
+      </button>
+      <a class="site-mobile-inquiry" href={CONTACT.kakaoChannel} target="_blank" rel="noopener">
+        <span>1:1</span>
+        <span>문의</span>
+      </a>
+    </div>
+    <script>
+      import '../scripts/smooth-scroll.js';
+      import '../scripts/subpage-animations.js';
+
+      const scrollTopButton = document.querySelector('[data-scroll-top]');
+      const syncFloatingActions = () => {
+        document.documentElement.classList.toggle('is-scroll-top-ready', window.scrollY > 220);
+      };
+
+      const moveToPageTop = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        document.dispatchEvent(new CustomEvent('gooddaily:scroll-top'));
+        window.setTimeout(syncFloatingActions, 760);
+      };
+
+      scrollTopButton?.addEventListener('pointerdown', moveToPageTop, { passive: false });
+      scrollTopButton?.addEventListener('click', moveToPageTop);
+
+      window.addEventListener('scroll', syncFloatingActions, { passive: true });
+      document.addEventListener('astro:page-load', syncFloatingActions);
+      syncFloatingActions();
+
+      const visitedListLinksKey = 'gooddaily:visited-list-links';
+      const visitedListSelectors = [
+        '.service-post-list li > a',
+        '.page-notice .board-list li > a',
+        '.board-list--careers li > a',
+        '.about-service-list li > a',
+      ].join(',');
+
+      const normalizeVisitedHref = (href) => {
+        try {
+          const url = new URL(href, window.location.origin);
+          return `${url.pathname}${url.search}${url.hash}`;
+        } catch {
+          return href;
+        }
+      };
+
+      const readVisitedListLinks = () => {
+        try {
+          return new Set(JSON.parse(window.localStorage.getItem(visitedListLinksKey) || '[]'));
+        } catch {
+          return new Set();
+        }
+      };
+
+      const writeVisitedListLinks = (visitedLinks) => {
+        try {
+          window.localStorage.setItem(visitedListLinksKey, JSON.stringify(Array.from(visitedLinks)));
+        } catch {
+          // Ignore storage failures; links still navigate normally.
+        }
+      };
+
+      const syncVisitedListLinks = () => {
+        const visitedLinks = readVisitedListLinks();
+
+        document.querySelectorAll(visitedListSelectors).forEach((link) => {
+          const listItem = link.closest('li');
+          if (!listItem) return;
+
+          const href = normalizeVisitedHref(link.getAttribute('href') || '');
+          listItem.classList.toggle('common-list-item--visited', visitedLinks.has(href));
+
+          if (link.dataset.visitedListReady === 'true') return;
+          link.dataset.visitedListReady = 'true';
+          link.addEventListener('click', () => {
+            const nextVisitedLinks = readVisitedListLinks();
+            nextVisitedLinks.add(href);
+            writeVisitedListLinks(nextVisitedLinks);
+            listItem.classList.add('common-list-item--visited');
+          });
+        });
+      };
+
+      document.addEventListener('astro:page-load', syncVisitedListLinks);
+      syncVisitedListLinks();
+
+      const closeLegalModal = (modal) => {
+        if (!(modal instanceof HTMLDialogElement) || !modal.open) return;
+
+        modal.classList.add('legal-modal--closing');
+        window.setTimeout(() => {
+          modal.classList.remove('legal-modal--closing');
+          if (modal.open) modal.close();
+        }, 180);
+      };
+
+      document.addEventListener('click', (event) => {
+        const openButton = event.target.closest('[data-legal-modal-open]');
+        if (openButton) {
+          const modal = document.querySelector(`dialog[data-legal-modal="${openButton.dataset.legalModalOpen}"]`);
+          if (modal instanceof HTMLDialogElement) {
+            modal.classList.remove('legal-modal--closing');
+            if (modal.open) modal.close();
+            modal.showModal();
+          }
+          return;
+        }
+
+        const closeButton = event.target.closest('[data-legal-modal-close]');
+        if (closeButton) {
+          closeLegalModal(closeButton.closest('dialog[data-legal-modal]'));
+          return;
+        }
+
+        if (event.target instanceof HTMLDialogElement && event.target.matches('dialog[data-legal-modal]')) {
+          closeLegalModal(event.target);
+        }
+      });
+    </script>
+  </body>
+</html>

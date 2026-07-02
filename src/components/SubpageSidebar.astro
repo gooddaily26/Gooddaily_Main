@@ -1,0 +1,40 @@
+---
+import { CONTACT, SERVICES_ORDERED, UTIL_NAV } from '../consts';
+
+const pathname = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const navGroups = [
+  { label: 'Service', items: SERVICES_ORDERED.map((service) => ({ label: service.name, href: `/${service.slug}/` })) },
+  { label: 'Info', items: [{ label: '회사소개', href: '/about/' }, ...UTIL_NAV] },
+];
+
+const isCurrent = (href: string) => {
+  const normalizedHref = href.endsWith('/') ? href : `${href}/`;
+  return pathname === normalizedHref || (normalizedHref !== '/' && pathname.startsWith(normalizedHref));
+};
+---
+
+<aside class="subpage-sidebar" aria-label="Sub page navigation">
+  <a class="subpage-sidebar__brand" href="/">
+    <span>홈</span>
+  </a>
+  <nav class="subpage-sidebar__nav" aria-label="Sub page menu">
+    {navGroups.map((group) => (
+      <div class="subpage-sidebar__group">
+        <p>{group.label}</p>
+        <ul>
+          {group.items.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                <span>{item.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </nav>
+  <div class="subpage-sidebar__actions">
+    <a class="service-share-button common-button--kakao" href={CONTACT.kakaoChannel} target="_blank" rel="noopener">카카오톡 문의</a>
+    <a class="service-primary-button" href={CONTACT.phoneHref}>상담하기</a>
+  </div>
+</aside>

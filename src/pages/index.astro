@@ -1,0 +1,827 @@
+---
+// =============================================================
+// 메인(회사소개) 페이지 — 4개 서비스를 묶는 상위 허브.
+// 블록: ① 히어로 ② 관련 브랜드 워드마크 ③ 4개 서비스 ④ 회사소개 ⑤ 파트너사 ⑥ 고객지원
+// =============================================================
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SEO } from '../seo.config';
+import ArrowIcon from '../components/ArrowIcon.astro';
+import { SITE, CONTACT, SOCIAL, SERVICES_ORDERED } from '../consts';
+
+
+const affiliateMarks = [
+  { label: 'MARKETING', icon: 'marketing', href: '/marketing/' },
+  { label: 'POS&PAY', icon: 'pay', href: '/terminal/' },
+  { label: 'VOUCHER', icon: 'voucher', href: '/voucher/' },
+  { label: 'SOLUTION', icon: 'solution', href: '/solution/' },
+];
+const partnerLogoChips = [
+  { name: '네이버', src: '/images/partners/platforms/naver_symbol.svg' },
+  { name: '구글', src: '/images/partners/platforms/google_symbol.svg' },
+  { name: '신세계 상품권', src: '/images/partners/platforms/shinsegae_symbol.svg' },
+  { name: '롯데 상품권', src: '/images/partners/platforms/lotte.svg' },
+  { name: '컬쳐랜드', src: '/images/partners/platforms/cultureland.png' },
+  { name: '해피머니', src: '/images/partners/platforms/happymoney.png' },
+  { name: '카카오톡', src: '/images/partners/platforms/kakaotalk_symbol.png' },
+  { name: 'Meta', src: '/images/partners/platforms/meta.webp' },
+  { name: '구글 광고', src: '/images/partners/platforms/googleads.webp' },
+  { name: '삼성페이', src: '/images/partners/platforms/samsungpay_square.png' },
+  { name: '마리나', src: '/images/partners/platforms/marina_symbol.png' },
+  { name: '페이플', src: '/images/partners/platforms/pple_square.png' },
+];
+const partnerShowcaseColumns = [
+  [
+    { name: '네이버', src: '/images/partners/platforms/naver_symbol.svg', tone: 'white' },
+    { name: '카카오톡', src: '/images/partners/platforms/kakaotalk_symbol.png', tone: 'blue' },
+    { name: '신세계 상품권', src: '/images/partners/platforms/shinsegae_symbol.svg', tone: 'white' },
+  ],
+  [
+    { name: '구글', src: '/images/partners/platforms/google_symbol.svg', tone: 'white' },
+    { name: 'Meta', src: '/images/partners/platforms/meta.webp', tone: 'deep' },
+    { name: '롯데 상품권', src: '/images/partners/platforms/lotte.svg', tone: 'sky' },
+  ],
+  [
+    { name: '컬쳐랜드', src: '/images/partners/platforms/cultureland.png', tone: 'deep' },
+    { name: '해피머니', src: '/images/partners/platforms/happymoney.png', tone: 'white' },
+    { name: '구글 광고', src: '/images/partners/platforms/googleads.webp', tone: 'blue' },
+  ],
+  [
+    { name: '삼성페이', src: '/images/partners/platforms/samsungpay_square.png', tone: 'white' },
+    { name: '마리나', src: '/images/partners/platforms/marina_symbol.png', tone: 'sky' },
+    { name: '페이플', src: '/images/partners/platforms/pple_square.png', tone: 'white' },
+  ],
+];
+const partnerShowcasePattern = (column) => [...column, ...column];
+const partnerShowcaseDirections = ['down', 'up', 'up', 'down'];
+const serviceVisuals = {
+  marketing: '/images/home/object-marina-marketing.png',
+  terminal: '/images/home/object-marina-terminal.png',
+  voucher: '/images/home/object-marina-voucher.png',
+  solution: '/images/home/object-marina-solution.png',
+};
+const serviceLinks = {
+  marketing: '/marketing/',
+  terminal: '/terminal/',
+  voucher: '/voucher/',
+  solution: '/solution/',
+};
+const serviceMoveLabels = {
+  marketing: '마리나 마케팅으로 이동',
+  terminal: '마리나 단말기로 이동',
+  voucher: '마리나 상품권으로 이동',
+  solution: '마리나 솔루션으로 이동',
+};
+const serviceNoticeLines = {
+  marketing: '검색 광고와 채널 운영을 중심으로 고객 유입을 설계하는 마케팅 전문 브랜드입니다.',
+  terminal: 'PG 연동, 카드 단말기, 간편결제 등 사업장 결제 환경을 함께 검토합니다.',
+  voucher: '모바일 상품권 자동매입과 정산 흐름을 담당하는 상품권 전문 브랜드입니다.',
+  solution: '매입, 정산, 관리자 기능 등 운영 자동화에 필요한 솔루션을 개발합니다.',
+};
+const serviceFlowSteps = [
+  {
+    eyebrow: 'STEP 01',
+    title: '고객 유입',
+    service: '마리나마케팅',
+    desc: '검색과 광고 채널에서 잠재 고객을 모으고 서비스 접점을 만듭니다.',
+    tag: 'Traffic',
+    href: '/marketing/',
+  },
+  {
+    eyebrow: 'STEP 02',
+    title: '결제 연결',
+    service: '마리나단말기',
+    desc: '매장과 온라인 결제 환경을 정리해 실제 거래가 끊기지 않게 받칩니다.',
+    tag: 'Payment',
+    href: '/terminal/',
+  },
+  {
+    eyebrow: 'STEP 03',
+    title: '상품권 순환',
+    service: '마리나상품권',
+    desc: '모바일 상품권 매입과 정산 흐름을 맡아 운영 자금을 빠르게 회전시킵니다.',
+    tag: 'Voucher',
+    href: '/voucher/',
+  },
+  {
+    eyebrow: 'STEP 04',
+    title: '운영 자동화',
+    service: '마리나솔루션',
+    desc: '반복 업무와 관리자 기능을 시스템화해 앞 단계의 데이터를 다시 연결합니다.',
+    tag: 'Automation',
+    href: '/solution/',
+  },
+];
+const supportItems = [
+  {
+    title: '전화 상담',
+    desc: '서비스 도입과 운영에 필요한 내용을 상담합니다.',
+    href: CONTACT.phoneHref,
+    icon: 'phone',
+  },
+  {
+    title: '카카오톡 문의',
+    desc: '간단한 문의는 카카오톡 채널로 남길 수 있습니다.',
+    href: CONTACT.kakaoChannel,
+    icon: 'chat',
+    external: true,
+  },
+  {
+    title: '공지사항',
+    desc: '굿데일리의 새로운 소식과 안내를 확인하세요.',
+    href: '/notice/',
+    icon: 'notice',
+  },
+  {
+    title: '채용',
+    desc: '각 분야의 전문가들과 함께 성장할 분을 찾습니다.',
+    href: '/careers/',
+    icon: 'careers',
+  },
+];
+const heroLeadPrefix = '좋은 하루를 만드는 파트너, ';
+const heroLeadBrand = '굿데일리';
+
+// Organization 구조화 데이터
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.legalName,
+  alternateName: SITE.name,
+  url: SITE.url,
+  logo: new URL('/images/brand/logo.png', SITE.url).href,
+  description: SITE.description,
+  slogan: SITE.slogan,
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: CONTACT.phoneDisplay,
+    contactType: 'customer service',
+    areaServed: 'KR',
+    availableLanguage: 'Korean',
+  },
+  ...(SOCIAL.length ? { sameAs: SOCIAL.map((s) => s.url) } : {}),
+};
+---
+
+<BaseLayout title={SEO.home.title} description={SEO.home.description} ogTitle={SEO.home.ogTitle} ogDescription={SEO.home.ogDescription} image={SEO.home.ogImage}>
+  <script type="application/ld+json" slot="jsonld" set:html={JSON.stringify(orgJsonLd)} />
+
+  <div class="page-home">
+    <!-- ① 히어로 -->
+    <section class="home-hero" aria-labelledby="home-hero-title">
+      <div class="home-hero-butterflies" aria-hidden="true">
+        <span class="home-hero-butterfly home-hero-butterfly--yellow">
+          <span class="home-hero-butterfly__body">
+            <span class="home-hero-butterfly__frame home-hero-butterfly__frame--closed"></span>
+            <span class="home-hero-butterfly__frame home-hero-butterfly__frame--mid"></span>
+            <span class="home-hero-butterfly__frame home-hero-butterfly__frame--open"></span>
+          </span>
+        </span>
+        <span class="home-hero-butterfly home-hero-butterfly--white">
+          <span class="home-hero-butterfly__body">
+            <span class="home-hero-butterfly__frame home-hero-butterfly__frame--closed"></span>
+            <span class="home-hero-butterfly__frame home-hero-butterfly__frame--mid"></span>
+            <span class="home-hero-butterfly__frame home-hero-butterfly__frame--open"></span>
+          </span>
+        </span>
+      </div>
+      <div class="container home-hero__inner">
+        <div class="home-hero__content">
+          <p class="common-badge home-hero__badge">결제 · 마케팅 · 상품권 · 솔루션</p>
+          <h1 id="home-hero-title">함께하는 모든 날을 좋은날로</h1>
+          <p class="home-hero__lead">
+            {Array.from(heroLeadPrefix).map((char, index) => (
+              char === '\n' ? (
+                <br class="home-hero__lead-break" aria-hidden="true" />
+              ) : (
+                <span
+                  class:list={[
+                    'home-hero__lead-char',
+                    { 'home-hero__lead-char--space': char === ' ' },
+                    { 'home-hero__lead-char--brand-gap': char === ' ' && index === heroLeadPrefix.length - 1 },
+                  ]}
+                  style={`--char-delay: ${index * 42}ms`}
+                  aria-hidden="true"
+                >
+                  {char}
+                </span>
+              )
+            ))}
+            <span
+              class="home-hero__title-gradient"
+              style={`--char-delay: ${heroLeadPrefix.length * 42}ms`}
+              aria-hidden="true"
+            >
+              {heroLeadBrand}
+            </span>
+            <span class="sr-only">{heroLeadPrefix}{heroLeadBrand}</span>
+          </p>
+          <p class="home-hero__summary">
+            결제부터 상품권 매입, 마케팅과 솔루션 개발까지<br />
+            굿데일리와 함께하세요!
+          </p>
+          <div class="home-hero__actions" aria-label="상담 및 서비스 이동">
+            <a class="common-button common-button--primary" href={CONTACT.phoneHref} aria-label="전화 상담">
+              전화 상담 <ArrowIcon />
+            </a>
+            <a class="common-button common-button--glass" href={CONTACT.kakaoChannel} target="_blank" rel="noopener" aria-label="카카오톡 문의">
+              카카오톡 문의 <ArrowIcon />
+            </a>
+          </div>
+          <div class="home-hero-platforms" aria-hidden="true">
+            <ul class="home-hero-platforms__track">
+              {[...partnerLogoChips, ...partnerLogoChips, ...partnerLogoChips].map((logo) => (
+                <li class="partner-logo-chip">
+                    <img src={logo.src} alt={logo.name} loading="lazy" data-partner={logo.name} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div class="home-hero__visual" aria-hidden="true">
+          <span class="home-hero__orbit"></span>
+          <span class="home-hero__bubble home-hero__bubble--large"></span>
+          <span class="home-hero__bubble home-hero__bubble--small"></span>
+          <span class="home-hero__cube"></span>
+          <span class="home-hero__ring"></span>
+        </div>
+      </div>
+
+      <!-- ② 관련 브랜드 워드마크 -->
+      <div class="home-affiliates" aria-label="굿데일리 관련 브랜드">
+        <div class="container home-affiliates__inner" data-affiliate-marks>
+          {affiliateMarks.map((mark) => (
+            <a class="home-affiliate-mark" href={mark.href}>
+              {mark.icon === 'marketing' && (
+                <svg class="home-affiliate-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4.5 16.5h15" />
+                  <path d="M6.5 14l4-4 3 3 4.5-5" />
+                  <path d="M15 8h3.5v3.5" />
+                </svg>
+              )}
+              {mark.icon === 'pay' && (
+                <svg class="home-affiliate-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="7" y="4.8" width="10" height="12.4" rx="2.4" />
+                  <path d="M9.5 8h5" />
+                  <path d="M9.5 11h5" />
+                  <path d="M8.8 19.2h6.4" />
+                  <path d="M12 17.2v2" />
+                </svg>
+              )}
+              {mark.icon === 'voucher' && (
+                <svg class="home-affiliate-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 8.5A2.5 2.5 0 0 1 7.5 6h9A2.5 2.5 0 0 1 19 8.5v1a2.5 2.5 0 0 0 0 5v1a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 15.5v-1a2.5 2.5 0 0 0 0-5v-1Z" />
+                  <path d="M9 12h6" />
+                  <path d="M12 9v6" />
+                </svg>
+              )}
+              {mark.icon === 'solution' && (
+                <svg class="home-affiliate-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="5" y="5" width="6" height="6" rx="2" />
+                  <rect x="13" y="13" width="6" height="6" rx="2" />
+                  <path d="M13.5 7.5H17a2 2 0 0 1 2 2V11" />
+                  <path d="M10.5 16.5H7a2 2 0 0 1-2-2V13" />
+                </svg>
+              )}
+              {mark.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <script>
+      const affiliateMarks = Array.from(document.querySelectorAll('[data-affiliate-marks] .home-affiliate-mark'));
+      const canAnimateAffiliateMarks = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (affiliateMarks.length && canAnimateAffiliateMarks) {
+        let activeAffiliateIndex = 0;
+
+        const activateAffiliateMark = () => {
+          affiliateMarks.forEach((item, index) => {
+            item.classList.toggle('home-affiliate-mark--active', index === activeAffiliateIndex);
+          });
+          activeAffiliateIndex = (activeAffiliateIndex + 1) % affiliateMarks.length;
+
+          window.setTimeout(() => {
+            affiliateMarks.forEach((item) => item.classList.remove('home-affiliate-mark--active'));
+            window.setTimeout(activateAffiliateMark, 1000);
+          }, 1100);
+        };
+
+        activateAffiliateMark();
+      }
+
+      const hero = document.querySelector('.home-hero');
+      const canUseHeroTrail =
+        hero &&
+        window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (canUseHeroTrail) {
+        const canvas = document.createElement('canvas');
+        canvas.className = 'home-hero__cursor-canvas';
+        canvas.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(canvas);
+
+        const context = canvas.getContext('2d');
+        const butterflies = Array.from(hero.querySelectorAll('.home-hero-butterfly'));
+        const butterflyStates = butterflies.map((item, index) => ({
+          item,
+          angle: index * Math.PI + .35,
+          radius: index ? 28 : 24,
+          speed: index ? -.058 : .072,
+          x: null,
+          y: null,
+          returnFromX: 0,
+          returnFromY: 0,
+          returnToX: 0,
+          returnToY: 0,
+          returnProgress: 0,
+          releaseTimer: 0,
+          mode: 'free',
+        }));
+        const points = [];
+        let bounds = hero.getBoundingClientRect();
+        let canvasWidth = window.innerWidth;
+        let canvasHeight = window.innerHeight;
+        let animationFrame = 0;
+        let butterflyFrame = 0;
+        let pointerPoint = null;
+        let lastPoint = null;
+        let isDrawing = false;
+
+        const resizeCanvas = () => {
+          bounds = hero.getBoundingClientRect();
+          const ratio = window.devicePixelRatio || 1;
+          canvasWidth = window.innerWidth;
+          canvasHeight = window.innerHeight;
+          canvas.width = Math.max(1, Math.floor(canvasWidth * ratio));
+          canvas.height = Math.max(1, Math.floor(canvasHeight * ratio));
+          canvas.style.width = `${canvasWidth}px`;
+          canvas.style.height = `${canvasHeight}px`;
+          context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        };
+
+        const drawTrail = () => {
+          context.clearRect(0, 0, canvasWidth, canvasHeight);
+          const now = performance.now();
+
+          for (let index = points.length - 1; index >= 0; index -= 1) {
+            if (now - points[index].time > 850) points.splice(index, 1);
+          }
+
+          if (points.length > 1) {
+            context.save();
+            context.lineCap = 'round';
+            context.lineJoin = 'round';
+
+            for (let index = 1; index < points.length; index += 1) {
+              const previous = points[index - 1];
+              const current = points[index];
+              const age = now - current.time;
+              const ageAlpha = Math.max(0, 1 - age / 850);
+              const tailProgress = index / (points.length - 1);
+              const tailAlpha = Math.pow(tailProgress, .42);
+              const alpha = Math.min(1, Math.pow(ageAlpha, .35) * tailAlpha * 1.18);
+              const glowColor = '255, 255, 255';
+              const coreColor = glowColor;
+
+              context.beginPath();
+              context.moveTo(previous.x, previous.y);
+              context.lineTo(current.x, current.y);
+              context.strokeStyle = `rgba(${glowColor}, ${alpha * .68})`;
+              context.lineWidth = 3;
+              context.shadowColor = `rgba(${glowColor}, ${alpha * .62})`;
+              context.shadowBlur = 12;
+              context.stroke();
+
+              context.beginPath();
+              context.moveTo(previous.x, previous.y);
+              context.lineTo(current.x, current.y);
+              context.strokeStyle = `rgba(${coreColor}, ${alpha})`;
+              context.lineWidth = 1;
+              context.shadowBlur = 0;
+              context.stroke();
+            }
+
+            context.restore();
+          }
+
+          if (points.length) {
+            animationFrame = window.requestAnimationFrame(drawTrail);
+          } else {
+            animationFrame = 0;
+          }
+        };
+
+        const releaseButterfly = (state) => {
+          if (state.mode !== 'chasing') return;
+          const isWhite = state.item.classList.contains('home-hero-butterfly--white');
+          state.mode = 'returning';
+          state.returnFromX = state.x ?? 0;
+          state.returnFromY = state.y ?? 0;
+          state.returnToX = isWhite ? -42 : bounds.width + 38;
+          state.returnToY = isWhite ? Math.min(bounds.height - 90, 520) : 150;
+          state.returnProgress = 0;
+          window.clearTimeout(state.releaseTimer);
+          state.item.classList.add('home-hero-butterfly--returning');
+        };
+
+        const resetButterfly = (state) => {
+          state.mode = 'free';
+          state.x = null;
+          state.y = null;
+          state.item.classList.remove('home-hero-butterfly--orbiting', 'home-hero-butterfly--returning');
+          state.item.style.removeProperty('transform');
+          state.item.style.removeProperty('filter');
+        };
+
+        const moveButterflies = () => {
+          bounds = hero.getBoundingClientRect();
+          const isPointerInsideHero =
+            pointerPoint &&
+            pointerPoint.x >= bounds.left &&
+            pointerPoint.x <= bounds.right &&
+            pointerPoint.y >= bounds.top &&
+            pointerPoint.y <= bounds.bottom;
+
+          let shouldKeepRunning = Boolean(isPointerInsideHero);
+
+          butterflyStates.forEach((state) => {
+            const rect = state.item.getBoundingClientRect();
+            const butterflyX = rect.left + rect.width / 2;
+            const butterflyY = rect.top + rect.height / 2;
+            const distance = isPointerInsideHero ? Math.hypot(pointerPoint.x - butterflyX, pointerPoint.y - butterflyY) : Infinity;
+            const isWhite = state.item.classList.contains('home-hero-butterfly--white');
+            const scaleY = isWhite ? -1 : 1;
+
+            if (state.mode === 'returning') {
+              state.returnProgress = Math.min(1, state.returnProgress + .024);
+              const ease = 1 - Math.pow(1 - state.returnProgress, 3);
+              const wobble = Math.sin(state.returnProgress * Math.PI * 5) * 18 * (1 - ease);
+              const x = state.returnFromX + (state.returnToX - state.returnFromX) * ease;
+              const y = state.returnFromY + (state.returnToY - state.returnFromY) * ease + wobble;
+              const tilt = (isWhite ? 190 : 14) + Math.sin(state.returnProgress * Math.PI * 4) * 14;
+
+              state.item.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg) scale(1, ${scaleY})`;
+              state.item.style.filter = 'blur(0)';
+              shouldKeepRunning = true;
+
+              if (state.returnProgress >= 1) resetButterfly(state);
+              return;
+            }
+
+            if (state.mode === 'free' && distance > 100) return;
+            if (state.mode === 'chasing' && (!isPointerInsideHero || distance > 190)) {
+              releaseButterfly(state);
+              shouldKeepRunning = true;
+              return;
+            }
+
+            if (state.mode === 'free') {
+              window.clearTimeout(state.releaseTimer);
+              state.x = rect.left - bounds.left;
+              state.y = rect.top - bounds.top;
+              state.mode = 'chasing';
+              state.item.classList.remove('home-hero-butterfly--returning');
+              state.item.classList.add('home-hero-butterfly--orbiting');
+            }
+
+            state.angle += state.speed;
+
+            const targetX = pointerPoint.x - bounds.left - rect.width / 2 + Math.cos(state.angle) * state.radius * .42;
+            const targetY = pointerPoint.y - bounds.top - rect.height / 2 + Math.sin(state.angle) * (state.radius * .32);
+            const follow = isWhite ? .34 : .38;
+            const tilt = Math.sin(state.angle) * 16;
+
+            state.x += (targetX - state.x) * follow;
+            state.y += (targetY - state.y) * follow;
+
+            state.item.style.transform = `translate3d(${state.x}px, ${state.y}px, 0) rotate(${tilt}deg) scale(1, ${scaleY})`;
+            state.item.style.filter = 'blur(0)';
+            shouldKeepRunning = true;
+          });
+
+          if (shouldKeepRunning) {
+            butterflyFrame = window.requestAnimationFrame(moveButterflies);
+          } else {
+            butterflyFrame = 0;
+          }
+        };
+
+        const requestButterflyFrame = () => {
+          if (!butterflyFrame && butterflyStates.length) {
+            butterflyFrame = window.requestAnimationFrame(moveButterflies);
+          }
+        };
+
+        window.addEventListener('pointerdown', (event) => {
+          if (event.button !== 0) return;
+          isDrawing = true;
+        });
+
+        window.addEventListener('pointerup', () => {
+          isDrawing = false;
+          lastPoint = null;
+        });
+
+        window.addEventListener('pointercancel', () => {
+          isDrawing = false;
+          lastPoint = null;
+        });
+
+        window.addEventListener('pointermove', (event) => {
+          bounds = hero.getBoundingClientRect();
+          const isInsideHero =
+            event.clientX >= bounds.left &&
+            event.clientX <= bounds.right &&
+            event.clientY >= bounds.top &&
+            event.clientY <= bounds.bottom;
+
+          if (!isInsideHero) {
+            lastPoint = null;
+            pointerPoint = null;
+            requestButterflyFrame();
+            return;
+          }
+
+          pointerPoint = { x: event.clientX, y: event.clientY };
+          requestButterflyFrame();
+
+          const point = {
+            x: event.clientX,
+            y: event.clientY,
+            time: performance.now(),
+            isDrawing,
+          };
+
+          if (lastPoint && Math.hypot(point.x - lastPoint.x, point.y - lastPoint.y) < 2) {
+            return;
+          }
+
+          points.push(point);
+          if (points.length > 168) points.shift();
+          lastPoint = point;
+
+          if (!animationFrame) animationFrame = window.requestAnimationFrame(drawTrail);
+        });
+
+        window.addEventListener('blur', () => {
+          isDrawing = false;
+          lastPoint = null;
+          pointerPoint = null;
+          requestButterflyFrame();
+        });
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+        window.addEventListener('pointerup', () => {
+          isDrawing = false;
+        });
+      }
+
+      const initHomeReveal = () => {
+        const revealTargets = Array.from(document.querySelectorAll([
+          '.page-home .home-services .common-section-header',
+          '.page-home .home-service-list > li',
+          '.page-home .home-service-note',
+          '.page-home .home-service-flow__lead',
+          '.page-home .home-service-flow__subcopy',
+          '.page-home .home-service-flow__step',
+          '.page-home .home-service-flow__summary',
+          '.page-home .home-about__media',
+          '.page-home .home-about__content',
+          '.page-home .home-partners .common-section-header',
+          '.page-home .home-support__header',
+          '.page-home .home-support-card',
+        ].join(',')));
+        const partnerCards = Array.from(document.querySelectorAll('.page-home .home-partner-card'));
+        const partnerShowcase = document.querySelector('.page-home .home-partner-showcase');
+        const canReveal = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        revealTargets.forEach((item, index) => {
+          item.classList.add('home-reveal');
+          item.style.setProperty('--reveal-delay', `${Math.min(index % 6, 5) * 70}ms`);
+        });
+
+        document.querySelector('.page-home .home-services .common-section-header')?.style.setProperty('--reveal-delay', '0ms');
+        Array.from(document.querySelectorAll('.page-home .home-service-list > li')).forEach((item, index) => {
+          item.style.setProperty('--reveal-delay', `${120 + index * 90}ms`);
+        });
+
+        document.querySelector('.page-home .home-service-flow__lead')?.style.setProperty('--reveal-delay', '0ms');
+        document.querySelector('.page-home .home-service-flow__subcopy')?.style.setProperty('--reveal-delay', '80ms');
+        Array.from(document.querySelectorAll('.page-home .home-service-flow__step')).forEach((item, index) => {
+          item.style.setProperty('--reveal-delay', `${160 + index * 90}ms`);
+        });
+        document.querySelector('.page-home .home-service-flow__summary')?.style.setProperty('--reveal-delay', '540ms');
+
+        partnerCards.forEach((item) => {
+          item.classList.add('home-partner-card--reveal');
+          item.style.setProperty('--partner-reveal-delay', `${Math.floor(Math.random() * 920)}ms`);
+        });
+
+        if (revealTargets.length && canReveal) {
+          const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('home-reveal--visible');
+              observer.unobserve(entry.target);
+            });
+          }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' });
+
+          revealTargets.forEach((item) => revealObserver.observe(item));
+        } else {
+          revealTargets.forEach((item) => item.classList.add('home-reveal--visible'));
+        }
+
+        const revealPartnerCards = () => {
+          partnerCards.forEach((item) => item.classList.add('home-partner-card--visible'));
+        };
+
+        if (partnerCards.length && partnerShowcase && canReveal) {
+          const partnerObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              revealPartnerCards();
+              observer.unobserve(entry.target);
+            });
+          }, { threshold: 0.2, rootMargin: '0px 0px -6% 0px' });
+
+          partnerObserver.observe(partnerShowcase);
+        } else {
+          revealPartnerCards();
+        }
+      };
+
+      if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', initHomeReveal, { once: true });
+      } else {
+        initHomeReveal();
+      }
+    </script>
+
+    <!-- ③ 4개 서비스 -->
+    <section class="section home-services" id="home-services" aria-labelledby="home-services-title">
+      <div class="container">
+        <div class="common-section-header home-services__header">
+          <p class="common-badge">Services</p>
+          <h2 id="home-services-title">굿데일리가 제공하는 <span class="common-gradient-text">4가지</span> 서비스!</h2>
+          <p>
+            사업장 결제, 상품권 자동매입, 검색 마케팅, 업무 솔루션까지<br />
+            고객 상황에 맞는 실무형 서비스를 제공합니다.
+          </p>
+        </div>
+
+        <ul class="home-service-list">
+          {SERVICES_ORDERED.map((service) => (
+            <li>
+              <a class="common-card home-service-card" href={serviceLinks[service.slug]} data-service={service.slug} aria-label={serviceMoveLabels[service.slug]}>
+                <div class="home-service-card__visual" aria-hidden="true">
+                  <img src={serviceVisuals[service.slug]} alt="" loading="lazy" />
+                </div>
+                <h3>{service.name}</h3>
+                <p>{service.tagline}</p>
+                <span class="home-service-card__link">
+                  <span class="home-service-card__arrow" aria-hidden="true"><ArrowIcon /></span>
+                  <span class="home-service-card__link-text">사이트로 이동</span>
+                </span>
+              </a>
+              <div class="home-service-note" aria-label={`${service.name} 안내사항`}>
+                <span class="home-service-note__text">{serviceNoticeLines[service.slug]}</span>
+                <a class="home-service-note__link" href={serviceLinks[service.slug]}>더보기</a>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+    <!-- ④ 회사소개 -->
+        <div class="home-service-flow" aria-labelledby="home-service-flow-title">
+          <p id="home-service-flow-title" class="home-service-flow__lead">
+            고객 유입, 결제, 상품권 정산, 운영 자동화가 하나의 흐름으로 이어집니다.
+          </p>
+          <p class="home-service-flow__subcopy">각 사이트는 독립적으로 운영되지만, 실제 사업 흐름 안에서는 서로의 빈칸을 채우는 역할로 연결됩니다.</p>
+
+        <ol class="home-service-flow__diagram" aria-label="굿데일리 서비스 상호보완 구조">
+          {serviceFlowSteps.map((step, index) => (
+            <li class="home-service-flow__step">
+              <div class="home-service-flow__card">
+                <span class="home-service-flow__eyebrow">{step.eyebrow}</span>
+                <span class="home-service-flow__icon" aria-hidden="true"></span>
+                <h3>{step.title}</h3>
+                <strong>{step.service}</strong>
+                <p>{step.desc}</p>
+                <span class="home-service-flow__tag">{step.tag}</span>
+              </div>
+              {index < serviceFlowSteps.length - 1 && (
+                <span class="home-service-flow__arrow" aria-hidden="true"><ArrowIcon /></span>
+              )}
+            </li>
+          ))}
+        </ol>
+
+        <div class="home-service-flow__summary">
+          <strong>서비스 연결 방식</strong>
+          <p>
+            굿데일리의 4개 서비스는 고객을 모으는 단계부터 결제와 정산, 반복 업무 개선까지 이어지는 운영 흐름을 기준으로 나뉩니다.<br />
+            한 서비스에서 생긴 요구는 다른 서비스의 기능과 연결되어 매장, 온라인 판매, 상품권 처리, 내부 관리 업무를 함께 보완합니다.<br />
+            각 사이트는 독립적인 상담 창구이면서도 실제 사업 운영에서는 필요한 지점마다 이어지는 하나의 지원 구조로 활용됩니다.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section home-about" aria-labelledby="home-about-title">
+      <div class="container home-about__inner">
+        <div class="home-about__media" aria-hidden="true">
+          <img src="/images/home/about-gooddaily-meeting.png" alt="" loading="lazy" />
+        </div>
+
+        <div class="home-about__content">
+          <p class="common-badge">About Good Daily</p>
+          <h2 id="home-about-title"><span class="common-gradient-text">전문가</span>들이 모여 만든, 굿데일리</h2>
+          <p>
+            굿데일리는 2019년 네이버·구글 검색최적화(SEO)와 구글 광고(Ads) 기반의
+            마케팅 대행에서 시작했습니다. 고객마다 다른 니즈에 맞춰 광고 환경을 직접
+            설계해 온 경험을 바탕으로, 단순 운영을 넘어 광고 관련 기술 개발로 영역을
+            넓혔습니다.
+          </p>
+          <p>
+            이후 업계 최초로 상품권 자동매입 솔루션을 자체 개발했고, PG 결제대행까지
+            사업을 확장했습니다. 마케팅·결제·상품권·개발 각 분야의 전문가들이 한자리에
+            모여 지금의 굿데일리를 이룹니다.
+          </p>
+          <div class="home-about__actions">
+            <a class="common-button common-button--primary" href={CONTACT.phoneHref}>
+              전화 상담 <ArrowIcon />
+            </a>
+            <a class="common-button common-button--kakao" href={CONTACT.kakaoChannel} target="_blank" rel="noopener">
+              카카오톡 문의 <ArrowIcon />
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ⑤ 파트너사 placeholder -->
+    <section class="section home-partners" aria-labelledby="home-partners-title">
+      <div class="container home-partners__inner">
+        <div class="common-section-header">
+          <p class="common-badge">Partners</p>
+          <h2 id="home-partners-title">함께하는 곳</h2>
+          <p>검색, 결제, 상품권, 운영 솔루션 흐름에서 함께 다루는 주요 채널과 브랜드입니다.</p>
+        </div>
+        <div class="home-partner-showcase" aria-hidden="true">
+          {partnerShowcaseColumns.map((column, columnIndex) => (
+            <div class="home-partner-column" data-direction={partnerShowcaseDirections[columnIndex]}>
+              <ul class="home-partner-track">
+                {partnerShowcasePattern(column, columnIndex).map((partner) => (
+                  <li class:list={['home-partner-card', { 'home-partner-card--empty': partner.empty }]} data-tone={partner.tone}>
+                    {!partner.empty && (
+                      partner.src ? (
+                        <img src={partner.src} alt="" loading="lazy" data-partner={partner.name} />
+                      ) : (
+                        <span>{partner.label}</span>
+                      )
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ⑥ 고객지원 / CTA -->
+    <section class="section home-support" aria-labelledby="home-support-title">
+      <div class="container home-support__inner">
+        <div class="common-section-header home-support__header">
+          <p class="common-badge">Support</p>
+          <h2 id="home-support-title">상담과 안내가 필요하신가요?</h2>
+          <p>서비스 도입, 운영 문의, 공지와 채용 소식까지 필요한 정보를 빠르게 확인하세요.</p>
+        </div>
+
+        <div class="home-support__grid">
+          {supportItems.map((item) => (
+            <a
+              class="home-support-card"
+              href={item.href}
+              target={item.external ? '_blank' : undefined}
+              rel={item.external ? 'noopener' : undefined}
+              data-support={item.icon}
+            >
+              <span class="home-support-card__icon" aria-hidden="true"></span>
+              <span class="home-support-card__text">
+                <strong>{item.title}</strong>
+                <small>{item.desc}</small>
+              </span>
+              <span class="home-support-card__arrow" aria-hidden="true"><ArrowIcon /></span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

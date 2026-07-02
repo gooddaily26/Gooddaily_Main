@@ -1,0 +1,192 @@
+﻿---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SECTOR_SEO } from '../../seo.config';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ArrowIcon from '../../components/ArrowIcon.astro';
+import ServiceSymbol from '../../components/ServiceSymbol.astro';
+import SubpageSidebar from '../../components/SubpageSidebar.astro';
+import { SERVICES, getService, CONTACT, SITE } from '../../consts';
+
+export async function getStaticPaths() {
+  return SERVICES.map((s) => ({ params: { sector: s.slug } }));
+}
+
+const { sector } = Astro.params;
+const service = getService(sector!)!;
+const related = getService(service.related);
+
+const posts = (await getCollection('posts', ({ data }) => data.sector === sector && !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const serviceVisuals = {
+  marketing: '/images/home/object-marina-marketing.png',
+  terminal: '/images/home/object-marina-terminal.png',
+  voucher: '/images/home/object-marina-voucher.png',
+  solution: '/images/home/object-marina-solution.png',
+};
+
+const serviceLogos = {
+  marketing: '/images/partners/marina-marketing/logo.png',
+  terminal: '/images/partners/marina-pos-and-pay/logo.png',
+  voucher: '/images/partners/marina-voucher/logo.png',
+  solution: '/images/partners/marina-solution/logo.png',
+};
+
+const visual = serviceVisuals[service.slug] ?? '/images/home/object-marina-solution.png';
+const logo = serviceLogos[service.slug] ?? '/images/brand/logo.png';
+const primaryServices = service.subServices.slice(0, 6);
+const cardServices = service.subServices.slice(0, 4);
+const cardIconTypes = {
+  marketing: ['naver', 'google', 'youtube', 'analytics'],
+  terminal: ['payment', 'gift', 'qr', 'sales'],
+  voucher: ['voucher', 'rate', 'shield', 'bulk'],
+  solution: ['automation', 'settlement', 'dashboard', 'api'],
+};
+const cardIcons = cardIconTypes[service.slug] ?? ['feature', 'feature', 'feature', 'feature'];
+const filterSteps = service.process.slice(0, 4);
+
+const serviceJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.name,
+  serviceType: service.keyword,
+  description: SECTOR_SEO[service.slug].description,
+  provider: { '@type': 'Organization', name: SITE.legalName, url: SITE.url },
+  areaServed: 'KR',
+  url: new URL(`/${service.slug}/`, SITE.url).href,
+};
+const fmt = (d: Date) => d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title={SECTOR_SEO[service.slug].title} description={SECTOR_SEO[service.slug].description} ogTitle={SECTOR_SEO[service.slug].ogTitle} ogDescription={SECTOR_SEO[service.slug].ogDescription} image={SECTOR_SEO[service.slug].ogImage}>
+  <script type="application/ld+json" slot="jsonld" set:html={JSON.stringify(serviceJsonLd)} />
+
+  <div class="page-service">
+    <div class="container page-service__container subpage-layout">
+      <SubpageSidebar />
+      <div class="subpage-main">
+        <Breadcrumb items={[{ name: service.name }]} />
+        <a class="common-card home-service-card service-breadcrumb-card" href={service.sourceSite ?? 'https://www.google.com/'} target="_blank" rel="noopener" style="pointer-events: none;">
+          <div class="home-service-card__visual service-breadcrumb-card__visual" aria-hidden="true">
+            <img src={visual} alt="" loading="lazy" />
+          </div>
+          <div class="service-breadcrumb-card__body">
+            <strong>{service.name}</strong>
+            <span>{service.tagline}</span>
+          </div>
+          <span class="home-service-card__link service-breadcrumb-card__link">
+            <span class="home-service-card__arrow" aria-hidden="true"><ArrowIcon /></span>
+            <span class="home-service-card__link-text">사이트로 이동</span>
+          </span>
+        </a>
+        <article class="service-panel">
+        <section class="service-hero" aria-labelledby="service-title">
+          <div class="service-hero__content">
+            <p class="service-kicker">{service.keyword}</p>
+            <h1 id="service-title">{service.headline}</h1>
+            <p class="service-hero__summary">{service.tagline}</p>
+            <div class="service-meta-row" aria-label="서비스 요약">
+              <span>{service.name}</span>
+              <span>{SITE.name}</span>
+              <span>{CONTACT.phoneDisplay}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="service-overview" aria-labelledby="service-overview-title">
+          <div class="service-overview__text">
+            <div class="service-overview__heading">
+              <img src={logo} alt="" loading="lazy" />
+              <h2 id="service-overview-title">{service.name} 소개</h2>
+            </div>
+            <p>{service.intro}</p>
+            <ul class="service-feature-list">
+              {primaryServices.map((item) => (
+                <li>
+                  <span class="service-feature-list__icon" aria-hidden="true">
+                    <ServiceSymbol type="feature" size="small" />
+                  </span>
+                  <span>{item.name}</span>
+                </li>
+              ))}
+            </ul>
+            <div class="service-overview__actions">
+              <a class="service-primary-button service-overview__site-button" href={service.sourceSite ?? 'https://www.google.com/'} target="_blank" rel="noopener" style="pointer-events: none;">
+                사이트로 이동
+              </a>
+            </div>
+          </div>
+
+          <div class="service-overview__image" aria-label={`${service.name} 주요 서비스 미리보기`}>
+            <img src={visual} alt="" loading="lazy" />
+          </div>
+        </section>
+
+        <section class="service-choice" aria-labelledby="service-choice-title">
+          <h2 id="service-choice-title">진행 방식</h2>
+          <div class="service-choice__bar">
+            {filterSteps.map((step, index) => (
+              <div class="service-choice__item">
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <strong>{step.title}</strong>
+                <small>{step.desc}</small>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section class="service-card-section" aria-labelledby="service-card-title">
+          <h2 id="service-card-title">{service.name} 주요 항목</h2>
+          <ul class="service-card-list">
+            {cardServices.map((item, index) => (
+              <li>
+                <article class="service-card">
+                  <span class="service-card__number">{index + 1}</span>
+                  <span class="service-card__icon" aria-hidden="true">
+                    <ServiceSymbol type={cardIcons[index]} size="small" />
+                  </span>
+                  <div class="service-card__body">
+                    <h3>{item.name}</h3>
+                    <p>{item.desc}</p>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section class="service-posts" aria-labelledby="posts-title">
+          <div class="service-section-heading">
+            <p class="service-kicker">Insight</p>
+            <h2 id="posts-title">{service.name} 관련 포스트</h2>
+          </div>
+          {posts.length === 0 ? (
+            <p class="service-empty">아직 등록된 글이 없습니다.</p>
+          ) : (
+            <ul class="service-post-list">
+              {posts.map((post) => (
+                <li>
+                  <a href={`/${sector}/${post.slug}/`}>
+                    <span>{post.data.title}</span>
+                    <time datetime={post.data.pubDate.toISOString()}>{fmt(post.data.pubDate)}</time>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {related && (
+          <section class="service-related" aria-label="함께 보면 좋은 서비스">
+            <a href={`/${related.slug}/`}>
+              함께 보면 좋은 서비스 <strong>{related.name}</strong> <ArrowIcon />
+            </a>
+          </section>
+        )}
+        </article>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+

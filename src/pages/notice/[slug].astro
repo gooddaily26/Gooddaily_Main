@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { seoTemplates } from '../../seo.config';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import SubpageSidebar from '../../components/SubpageSidebar.astro';
+
+export async function getStaticPaths() {
+  const notices = await getCollection('notices', ({ data }) => !data.draft);
+  return notices.map((n) => ({ params: { slug: n.slug }, props: { notice: n } }));
+}
+
+const { notice } = Astro.props;
+const { Content } = await notice.render();
+const fmt = (d: Date) => d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<BaseLayout title={seoTemplates.notice(notice.data.title).title} description={seoTemplates.notice(notice.data.title).description}>
+  <div class="page-board page-notice-detail">
+    <div class="container subpage-layout">
+      <SubpageSidebar />
+      <div class="subpage-main">
+      <Breadcrumb items={[
+        { name: '공지사항', href: '/notice/' },
+        { name: notice.data.title },
+      ]} />
+      <article class="article article-board">
+        <header>
+          <h1>{notice.data.title}</h1>
+          <p class="meta"><time datetime={notice.data.pubDate.toISOString()}>{fmt(notice.data.pubDate)}</time></p>
+        </header>
+        <div class="prose"><Content /></div>
+        <p class="back"><a href="/notice/">← 공지사항 목록</a></p>
+      </article>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

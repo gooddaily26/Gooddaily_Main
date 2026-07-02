@@ -1,0 +1,133 @@
+---
+import { SITE, MAIN_NAV, UTIL_NAV, CONTACT } from '../consts';
+import ArrowIcon from './ArrowIcon.astro';
+
+const path = Astro.url.pathname;
+const isSubpage = path !== '/';
+---
+
+<header class:list={['site-header', { 'site-header--subpage': isSubpage }]} data-site-header>
+  <div class="container site-header__inner">
+    <a href="/" class="site-brand" aria-label={`${SITE.name} 홈`}>
+      <img src="/images/brand/logo.png" alt={SITE.name} class="site-brand__logo" />
+    </a>
+
+    <button
+      class="site-menu-toggle"
+      type="button"
+      aria-label="메뉴 열기"
+      aria-controls="site-nav"
+      aria-expanded="false"
+      data-menu-toggle
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="주 메뉴" data-site-nav>
+      <ul class="site-nav__list">
+        {MAIN_NAV.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={path === item.href ? 'page' : undefined}
+            >{item.label}</a>
+          </li>
+        ))}
+        {UTIL_NAV.map((item) => (
+          <li class="site-nav__util">
+            <a
+              href={item.href}
+              aria-current={path === item.href ? 'page' : undefined}
+            >{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="site-header__cta-group">
+      <a class="common-button common-button--primary site-header__cta" href={CONTACT.phoneHref} aria-label="전화 상담">
+        전화 상담 <ArrowIcon />
+      </a>
+      <a class="common-button common-button--glass site-header__cta" href={CONTACT.kakaoChannel} target="_blank" rel="noopener" aria-label="카카오톡 문의">
+        카카오톡 문의 <ArrowIcon />
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  const initHeader = () => {
+    const siteHeader = document.querySelector('[data-site-header]');
+    const siteMenuToggle = document.querySelector('[data-menu-toggle]');
+    const siteNav = document.querySelector('[data-site-nav]');
+
+    if (!siteHeader || !siteMenuToggle || !siteNav) return;
+
+    const updateHeaderState = () => {
+      const shouldUseSubpageBrand = window.location.pathname !== '/';
+
+      siteHeader.classList.toggle('site-header--scrolled', window.scrollY > 12);
+      siteHeader.classList.toggle('site-header--subpage', shouldUseSubpageBrand);
+    };
+
+    const updateNavCurrent = () => {
+      const currentPath = window.location.pathname;
+      siteNav.querySelectorAll('a').forEach((link) => {
+        const linkPath = new URL(link.href).pathname;
+        if (linkPath === currentPath) {
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+    };
+
+    const setMenuOpen = (isOpen) => {
+      siteHeader.classList.toggle('site-header--menu-open', isOpen);
+      siteMenuToggle.setAttribute('aria-expanded', String(isOpen));
+      siteMenuToggle.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
+    };
+
+    if (!siteHeader.hasAttribute('data-header-ready')) {
+      siteHeader.setAttribute('data-header-ready', 'true');
+
+      siteMenuToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        setMenuOpen(!siteHeader.classList.contains('site-header--menu-open'));
+      });
+
+      siteNav.addEventListener('click', (event) => {
+        if (event.target instanceof Element && event.target.closest('a')) {
+          setMenuOpen(false);
+        }
+      });
+
+      document.addEventListener('click', (event) => {
+        if (
+          siteHeader.classList.contains('site-header--menu-open') &&
+          event.target instanceof Node &&
+          !siteHeader.contains(event.target)
+        ) {
+          setMenuOpen(false);
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.matchMedia('(min-width: 821px)').matches) {
+          setMenuOpen(false);
+        }
+      });
+
+      window.addEventListener('scroll', updateHeaderState, { passive: true });
+    }
+
+    setMenuOpen(false);
+    updateHeaderState();
+    updateNavCurrent();
+  };
+
+  initHeader();
+  document.addEventListener('astro:page-load', initHeader);
+</script>
