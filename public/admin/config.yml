@@ -6,9 +6,9 @@
 
 backend:
   name: github
-  repo: OWNER/REPO        # TODO: 깃허브 사용자명/저장소명 (예: gooddaily/goodaily-site)
+  repo: gooddaily26/Gooddaily_Main
   branch: main
-  base_url: https://sveltia-cms-auth.YOUR-SUBDOMAIN.workers.dev  # TODO: OAuth 워커 주소 (ADMIN-SETUP.md 참고)
+  base_url: https://sveltia-cms-auth.gooddaily.workers.dev
 
 # 이미지 업로드 위치 (레포에 저장 / 사이트에서 /images/uploads/ 로 참조)
 media_folder: "public/images/uploads"
