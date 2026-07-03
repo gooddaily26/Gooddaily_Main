@@ -5142,6 +5142,7 @@ button:focus-visible,
 .site-footer__quick a {
   justify-content: center;
 }
+
 /* 모바일 푸터 사업자정보 — 라벨(주소·이메일) 글자 쪼개짐 방지 */
 @media (max-width: 820px) {
   .site-footer__biz dl {
