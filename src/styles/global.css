@@ -5142,3 +5142,18 @@ button:focus-visible,
 .site-footer__quick a {
   justify-content: center;
 }
+/* 모바일 푸터 사업자정보 — 라벨(주소·이메일) 글자 쪼개짐 방지 */
+@media (max-width: 820px) {
+  .site-footer__biz dl {
+    grid-template-columns: 1fr;   /* 2열 → 1열로 (좁은 폭에서 넉넉하게) */
+  }
+  .site-footer__biz dt {
+    white-space: nowrap;          /* '주소'·'이메일' 라벨이 세로로 안 쪼개짐 */
+    flex-shrink: 0;
+  }
+  .site-footer__biz dd {
+    min-width: 0;
+    word-break: keep-all;         /* 한글 주소는 띄어쓰기 단위로 줄바꿈 */
+    overflow-wrap: anywhere;      /* 긴 이메일은 넘칠 때 적절히 줄바꿈 */
+  }
+}
