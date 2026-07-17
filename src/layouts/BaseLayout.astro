@@ -96,6 +96,12 @@ wcs_do();
           page_path: location.pathname + location.search,
           page_title: document.title,
         });
+        // ↓ 추가되는 부분: 네이버 애널리틱스 페이지뷰
+        if (window.wcs) {
+          window.wcs_add = window.wcs_add || {};
+          window.wcs_add['wa'] = '17a848827b6f550';
+          window.wcs_do();
+        }
       });
     </script>
   </head>
