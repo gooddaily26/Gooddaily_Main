@@ -77,6 +77,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
     <slot name="jsonld" />
     <ViewTransitions />
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      document.addEventListener('astro:page-load', () => {
+        window.dataLayer.push({
+          event: 'spa_pageview',
+          page_location: location.href,
+          page_path: location.pathname + location.search,
+          page_title: document.title,
+        });
+      });
+    </script>
   </head>
 
   <body>
