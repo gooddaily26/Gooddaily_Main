@@ -677,7 +677,7 @@ const orgJsonLd = {
         <ul class="home-service-list">
           {SERVICES_ORDERED.map((service) => (
             <li>
-              <a class="common-card home-service-card" href={serviceLinks[service.slug]} data-service={service.slug} aria-label={serviceMoveLabels[service.slug]}>
+              <a class="common-card home-service-card" href={service.slug === 'terminal' ? 'https://www.마리나페이.com/' : serviceLinks[service.slug]} target={service.slug === 'terminal' ? '_blank' : undefined} rel={service.slug === 'terminal' ? 'noopener' : undefined} data-service={service.slug} aria-label={serviceMoveLabels[service.slug]}>
                 <div class="home-service-card__visual" aria-hidden="true">
                   <img src={serviceVisuals[service.slug]} alt="" loading="lazy" />
                 </div>
