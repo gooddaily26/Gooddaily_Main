@@ -112,7 +112,7 @@ const fmt = (d: Date) => d.toLocaleDateString('ko-KR', { year: 'numeric', month:
               ))}
             </ul>
             <div class="service-overview__actions">
-              <a class="service-primary-button service-overview__site-button" href={service.sourceSite ?? 'https://www.google.com/'} target="_blank" rel="noopener" style="pointer-events: none;">
+              <a class="service-primary-button service-overview__site-button" href={service.sourceSite ?? 'https://www.google.com/'} target="_blank" rel="noopener" style={service.sourceSite ? undefined : 'pointer-events: none;'}>
                 사이트로 이동
               </a>
             </div>
