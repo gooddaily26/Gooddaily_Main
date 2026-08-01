@@ -105,6 +105,7 @@ export const SERVICES: Service[] = [
       { title: '운영 안내', desc: '매출 확인과 정산 흐름을 함께 점검합니다.' },
     ],
     related: 'marketing',
+    sourceSite: 'https://www.마리나페이.com/',  // ← 이 줄 추가
   },
   {
     slug: 'voucher',
