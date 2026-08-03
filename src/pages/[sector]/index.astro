@@ -89,7 +89,7 @@ const fmt = (d: Date) => d.toLocaleDateString('ko-KR', { year: 'numeric', month:
             <div class="service-meta-row" aria-label="서비스 요약">
               <span>{service.name}</span>
               <span>{SITE.name}</span>
-              <span>{CONTACT.phoneDisplay}</span>
+              <span>{service.phone ?? CONTACT.phoneDisplay}</span>
             </div>
           </div>
         </section>
