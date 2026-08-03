@@ -43,7 +43,8 @@ export interface Service {
   process: ProcessStep[];
   related: string;
   sourceSite?: string;
-}
+  phone?: string;
+} 
 
 export const SERVICES: Service[] = [
   {
@@ -75,6 +76,7 @@ export const SERVICES: Service[] = [
       { title: '성과 확인', desc: '결과를 바탕으로 개선 방향을 조정합니다.' },
     ],
     related: 'terminal',
+    phone: '010-9021-7714',
   },
   {
     slug: 'terminal',
@@ -105,6 +107,7 @@ export const SERVICES: Service[] = [
       { title: '운영 안내', desc: '매출 확인과 정산 흐름을 함께 점검합니다.' },
     ],
     related: 'marketing',
+    phone: '010-8555-3944',
     sourceSite: 'https://www.마리나페이.com/',  // ← 이 줄 추가
   },
   {
@@ -135,6 +138,7 @@ export const SERVICES: Service[] = [
       { title: '정산 안내', desc: '확인 후 정산 흐름을 안내합니다.' },
     ],
     related: 'solution',
+    phone: '010-8570-7714',
   },
   {
     slug: 'solution',
@@ -164,6 +168,7 @@ export const SERVICES: Service[] = [
       { title: '운영 지원', desc: '도입 이후 운영과 개선 방향을 함께 점검합니다.' },
     ],
     related: 'voucher',
+    phone: '010-8570-7714',
   },
 ];
 
