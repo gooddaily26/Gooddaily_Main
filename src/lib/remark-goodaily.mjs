@@ -21,10 +21,20 @@ export default function remarkGoodaily() {
 
 function walk(node) {
   if (!node || !Array.isArray(node.children)) return;
-  for (const child of node.children) {
+  node.children.forEach((child, i) => {
+    // 표는 .table-wrap으로 감싸 모바일에서 가로 스크롤되게 함 (스타일: global.css)
+    if (child.type === 'table') {
+      node.children[i] = {
+        type: 'goodailyTableWrap',
+        data: { hName: 'div', hProperties: { className: ['table-wrap'] } },
+        children: [child],
+      };
+      walk(child);
+      return;
+    }
     transform(child);
     walk(child);
-  }
+  });
 }
 
 function transform(node) {

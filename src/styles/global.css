@@ -5097,6 +5097,48 @@ button:focus-visible,
   box-shadow: inset 0 1px 0 #a8deff, inset 0 -2px 0 #1f6dcc, 0 14px 28px #cfe4fb;
 }
 
+/* 본문 표 — remark(remark-goodaily)가 .table-wrap으로 감싸 모바일 가로 스크롤 지원 */
+.prose .table-wrap {
+  margin: 0 0 18px;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2eaf5;
+}
+
+.prose .table-wrap table {
+  width: 100%;
+  min-width: 460px;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.prose .table-wrap th,
+.prose .table-wrap td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #e2eaf5;
+  text-align: left;
+  vertical-align: top;
+  word-break: keep-all;
+}
+
+.prose .table-wrap th {
+  background: #eef4fc;
+  color: #102b5f;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.prose .table-wrap td {
+  background: #fff;
+  color: #405577;
+}
+
+.prose .table-wrap tr:last-child td {
+  border-bottom: 0;
+}
+
 /* 푸터 '전화 상담' 빠른버튼 — 파란색(주요 버튼과 통일, 기존 흰색 대체) */
 .site-footer__quick a.site-footer__quick-phone {
   background: var(--gradient-blue-deep);

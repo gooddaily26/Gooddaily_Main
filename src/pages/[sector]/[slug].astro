@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { withBrand } from '../../seo.config';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import PostToc from '../../components/PostToc.astro';
 import SubpageSidebar from '../../components/SubpageSidebar.astro';
 import { getService, SITE } from '../../consts';
 
@@ -15,7 +16,7 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await post.render();
+const { Content, headings } = await post.render();
 const service = getService(post.data.sector)!;
 
 const siblings = (await getCollection('posts', ({ data, slug }) =>
@@ -29,7 +30,7 @@ const articleJsonLd = {
   headline: post.data.title,
   description: post.data.description,
   datePublished: post.data.pubDate.toISOString(),
-  ...(post.data.updatedDate ? { dateModified: post.data.updatedDate.toISOString() } : {}),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
   ...(post.data.heroImage ? { image: new URL(post.data.heroImage, SITE.url).href } : {}),
   author: { '@type': 'Organization', name: SITE.legalName },
   publisher: { '@type': 'Organization', name: SITE.legalName, url: SITE.url },
@@ -68,6 +69,8 @@ const fmt = (d: Date) => d.toLocaleDateString('ko-KR', { year: 'numeric', month:
     {post.data.heroImage && (
       <img src={post.data.heroImage} alt={post.data.heroImageAlt ?? post.data.title} />
     )}
+
+    <PostToc headings={headings} />
 
     <div class="prose">
       <Content />

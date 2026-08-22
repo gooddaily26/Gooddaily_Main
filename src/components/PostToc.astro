@@ -1,0 +1,111 @@
+---
+/**
+ * 글 목차 — 본문 소제목(H2/H3)을 자동으로 목차로 출력합니다.
+ * 소제목마다 Astro가 자동 생성한 한글 앵커(id)로 이동하며,
+ * 클릭 스크롤은 사이트 공통 lenis(anchors) + CSS scroll-margin이 처리합니다.
+ * H2가 2개 미만인 짧은 글에는 목차를 표시하지 않습니다.
+ */
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+interface Props {
+  headings: Heading[];
+}
+const { headings } = Astro.props;
+
+const relevant = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const h2Count = relevant.filter((h) => h.depth === 2).length;
+
+type TocItem = Heading & { children: Heading[] };
+const items: TocItem[] = [];
+for (const h of relevant) {
+  if (h.depth === 2 || items.length === 0) {
+    items.push({ ...h, children: [] });
+  } else {
+    items[items.length - 1].children.push(h);
+  }
+}
+---
+
+{h2Count >= 2 && (
+  <nav class="post-toc" aria-label="목차">
+    <p class="post-toc__title">목차</p>
+    <ol>
+      {items.map((item) => (
+        <li>
+          <a href={`#${item.slug}`}>{item.text}</a>
+          {item.children.length > 0 && (
+            <ol>
+              {item.children.map((c) => (
+                <li><a href={`#${c.slug}`}>{c.text}</a></li>
+              ))}
+            </ol>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .post-toc {
+    margin: 24px 0;
+    padding: 20px 24px;
+    border: 1px solid #e2eaf5;
+    border-radius: 18px;
+    background: #fff;
+    font-family: var(--font-body);
+  }
+
+  .post-toc__title {
+    margin: 0 0 10px;
+    color: #102b5f;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .post-toc ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: toc;
+  }
+
+  .post-toc li {
+    counter-increment: toc;
+    padding: 3px 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .post-toc li::before {
+    content: counters(toc, ".") ". ";
+    color: #3367f6;
+    font-weight: 600;
+  }
+
+  .post-toc li ol {
+    margin-top: 2px;
+    padding-left: 18px;
+  }
+
+  .post-toc a {
+    color: #405577;
+    text-decoration: none;
+    word-break: keep-all;
+  }
+
+  .post-toc a:hover {
+    color: #3367f6;
+    text-decoration: underline;
+  }
+
+  @media (max-width: 620px) {
+    .post-toc {
+      padding: 16px 18px;
+    }
+  }
+</style>
