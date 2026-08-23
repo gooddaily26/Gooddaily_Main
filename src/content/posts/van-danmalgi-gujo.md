@@ -6,7 +6,7 @@ pubDate: 2026-08-22
 updatedDate: ''
 heroImage: /images/uploads/이미지 변경_1.png
 heroImageAlt: 카드단말기 신용카드 결제 이미지
-draft: true
+draft: false
 ---
 
 사업자등록을 마치고 나면 어디서 번호를 알았는지 단말기 영업 전화가 걸려오기 시작합니다. 전화마다 조건이 다르고, 어떤 곳은 VAN이라 하고 어떤 곳은 PG라고 합니다. VAN과 PG가 어떻게 다른지 모르면 어느 쪽 조건이 좋은지 비교할 방법이 없습니다.
