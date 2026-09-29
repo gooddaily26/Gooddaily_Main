@@ -81,8 +81,12 @@ const year = new Date().getFullYear();
           </div>
         )}
         <div>
-          <dt>고객문의</dt>
-          <dd><a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a></dd>
+            <dt>고객문의</dt>
+            <dd><a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a></dd>
+          </div>
+          <div>
+            <dt>팩스</dt>
+            <dd>{CONTACT.faxDisplay}</dd>
         </div>
         {BUSINESS.email && (
           <div>
