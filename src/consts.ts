@@ -13,9 +13,10 @@ export const SITE = {
 };
 
 export const CONTACT = {
-  phoneDisplay: '010-8570-7714',
-  phoneHref: 'tel:010-85707714',
-  kakaoChannel: 'https://pf.kakao.com/_rgxinX',
+    phoneDisplay: '1600-1268',
+    phoneHref: 'tel:1600-1268',
+    faxDisplay: '070-7614-1095',
+    kakaoChannel: 'https://pf.kakao.com/_rgxinX',
 };
 
 export const SOCIAL: { label: string; url: string }[] = [];
